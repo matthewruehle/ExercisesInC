@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 void get_input(char * destination) {
 	puts("Enter the card_name: ");
