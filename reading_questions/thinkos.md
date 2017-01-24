@@ -4,19 +4,30 @@
 ### Compilation
 
 1) Give an example of a feature common in interpreted languages that is rare in compiled languages.
+	- Interpreted languages often allow dynamic typing, while compiled languages typically only support static types.
 
 2) Name two advantages of static typing over dynamic typing.
+	- Static typing is less error-prone, since assigning the wrong type of value will produce a compile-time error.
+	- Static typing is more memory-efficient, since variable names and "buffer" space must be stored at runtime, rather than simply allocating a memory block.
 
 3) Give an example of a static semantic error.
+	- One example of a static semantic error could be passing a non-int as the index of an array - for example,
+	int array[6] = {1,2,3,4,5,6} 
+	double location = 3.0
+	printf("%d\n", array[location]);
 
 4) What are two reasons you might want to turn off code optimization?
+	- Code optimization could, potentially, introduce a bug which would be difficult to locate in the code itself. Optimization further requires more time to compile.
 
 5) When you run `gcc` with `-S`, why might the results look different on different computers?
+	- The '-S' flag generates assembly code; assembly code, however, varies from computer to computer/processor to processor (e.g., AMD vs Intel vs ...), since it's essentially instructions to the hsardware.
 
 6) If you spell a variable name wrong, or if you spell a function name wrong, 
 the error messages you get might look very different.  Why?
+	- The error messages change based on what the error the compiler finds - e.g., not finding a reference vs. searching for a nonexistent variable.
 
 7) What is a segmentation fault?
+	- A segfault occurs when a program, while running, tries to write to a place in memory that it can't actually write to.
 
 
 ## Chapter 2
