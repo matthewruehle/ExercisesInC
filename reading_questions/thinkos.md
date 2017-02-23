@@ -36,15 +36,21 @@ the error messages you get might look very different.  Why?
 ### Processes
 
 1) Give a real-world example of virtualization (ideally not one of the ones in the book).
+	- For a physical option - the "old" netflix (that is to say, the one that sent people DVDs in the mail) allowed subscribers their choice of media, while maintaining only a limited total collection - akin, at least somewhat, to the library example.
+	- "Virtual machines" (e.g. vmware, virtualbox) are additional examples of real-world virtualization: the abstraction of hardware/system resources, such that a guest operating system can act as though it's using a physical computer without allocating physical resources directly to it.
 
 2) What is the difference between a program and a process?
+	- A process is a program which is in the act of running - the program's instructions itself, and the state of its memory/data which are currently in use.
 
 3) What is the primary purpose of the process abstraction?  What illusion does the process abstraction create?
+	- Process abstraction is meant to keep programs from interacting negatively with each other - whether through attempting to read and write to the same memory locations, or through competing directly with one another for access to system resources. This leads to the illusion that all processes have access to the entirety of available/permitted resources, when in fact the physical memory/resources are managed externally.
 
 4) What is the kernel?
+	- The kernel is the "layer" of the operating system which spawns processes and threads - the "roots" to a group of trees. It connects physical resources, IO, startup, etc., to applications and other programs.
 
 5) What is a daemon?
- 
+	- so too was this light more than the absence of darkness. there was a purity to it, a brilliance before which any mortal flesh seemed but filth. it will wash clean our sins, our gluttonies, our wretched memories. we will be pardoned, though our bodies will not survive the journey.
+	- a daemon is a system tool, constantly running in the background, managing OS services (e.g., memory cleaning) so that processes don't have to worry about them individually.
 
 ## Chapter 3
 
@@ -52,30 +58,43 @@ the error messages you get might look very different.  Why?
 ### Virtual memory
 
 1) The Georgian alphabet has 33 letters.  How many bit are needed to specify a letter?
+	- 6 bits (assuming we don't care about capitalization or other such nonsense).
+
 
 2) In the UTF-16 character encoding, the binary representation of a character can take up to 32 bits.  
 Ignoring the details of the encoding scheme, how many different characters can be represented?
+	- 2^32, or a bit above 4 billion.
 
 3) What is the difference between "memory" and "storage" as defined in Think OS?
+	- Memory is the data held by a running process, often in RAM; storage is the long-term "reference" like that of a disk drive.
 
 4) What is the difference between a GiB and a GB?  What is the percentage difference in their sizes?
+	- GiB is "gibibyte" - 2^30 bytes; GB is "gigabyte" - 10^9 bytes. GiB is in base 2, to GB's base 10 - a roughly 7% difference in sizes.
 
 5) How does the virtual memory system help isolate processes from each other?
+	- Virtual memory allows for processes to have access to a "continuous" space, without potentially reading/writing data that belongs to other processes.
 
 6) Why do you think the stack and the heap are usually located at opposite ends of the address space?
+	- Both are positioned so that they could, potentially, expand outwards; putting one at the "top" and one at the "bottom" allows each the most potential room to grow without colliding.
 
 7) What Python data structure would you use to represent a sparse array?
+	- My first inclination would be a dictionary, where accessing a non-member just returns the null/zero/default value.
 
 8) What is a context switch?
+	- The OS stops a current process, saving its state, so that resources can be spent on another process - then, later, the original process can be picked up and re-set to the saved state, allowing it to "pick up where it left off," as it were.
 
 In this directory, you should find a subdirectory named `aspace` that contains `aspace.c`.  Run it on your computer and compare your results to mine.
+	- OK.
   
 1) Add a second call to `malloc` and check whether the heap on your system grows up (toward larger addresses).  
+	- yep.
 
 2) Add a function that prints the address of a local variable, and check whether the stack grows down.  
+	- also, yep.
 
 3) Choose a random number between 1 and 32, and allocate two chunks with that size.  
 How much space is there between them?  Hint: Google knows how to subtract hexadecimal numbers.
+	- 0x20, or 32 (bytes, I believe).
 
 
 ## Chapter 4
@@ -83,22 +102,28 @@ How much space is there between them?  Hint: Google knows how to subtract hexade
 
 ### Files and file systems
 
-1) What abstractions do file systems provide?  Give an example of something that is logically 
-true about files systems but not true of their implementations.
+1) What abstractions do file systems provide?  Give an example of something that is logically true about files systems but not true of their implementations.
+	- File systems provide abstractions like file names and locations (e.g., hierarchical directories/folders). Implementations, meanwhile, contend with memory based on blocks - rather than the file size itself in bytes - and don't locate all elements within the same "folder space" (or else, any change at all could require the entire disk be rewritten).
 
 2) What information do you imagine is stored in an `OpenFileTableEntry`?
+	- The information on an open file - its memory location, where the program is "in" the file, and any buffer for writing data.
 
 3) What are some of the ways operating systems deal with the relatively slow performance of persistent storage?
+	- Buffering: pre-loading information, saving data to write and then writing it all at once, etc.
 
 4) Suppose your program writes a file and prints a message indicating that it is done writing.  
 Then a power cut crashes your computer.  After you restore power and reboot the computer, you find that the 
 file you wrote is not there.  What happened?
+	- Most likely, the file output was buffered (since writing to a file is a much lengthier process, time-wise, than the rest of the program may be); the buffer only gets written once the file is "closed," which in this scenario never occurred.
 
 5) Can you think of one advantage of a File Allocation Table over a UNIX inode?  Or an advantage of a inode over a FAT?
+	- Inodes live with other blocks of memory, putting them "at" the data they use; FAT, meanwhile, keeps them all centrally. FAT makes it easier to get a "feel" for the land - say, an index or a table of contents - while inodes makes it easier to reference "in the field." (apologies if this is a terrible analogy, it's just the one that came to mind.)
 
 6) What is overhead?  What is fragmentation?
+	- Fragmentation is splitting a large file into many smaller files. It allows a large file to be written into space which was freed after being used before, without having to create a single empty series of blocks to store it. Overhead is the space used by the various tools keeping track of metadata, fragmentation, etc. - "wasted" space, in a sense, that isn't used to keep the actual data.
 
 7) Why is the "everything is a file" principle a good idea?  Why might it be a bad idea?
+	- Having everything act as a file seems useful for network programming - allowing the methods of writing to a file to be used for socket communication; however, it seems like it would be much easier to accidentally mis-use (e.g., writing to a stream instead of a file) than if the "mechanism" were more divorced from file descriptors.
 
 If you would like to learn more about file systems, a good next step is to learn about journaling file systems.  
 Start with [this Wikipedia article](https://en.wikipedia.org/wiki/Journaling_file_system), then 
