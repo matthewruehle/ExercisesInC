@@ -19,3 +19,4 @@ float random_float();
 float random_double();
 
 
+#include "rand.c"

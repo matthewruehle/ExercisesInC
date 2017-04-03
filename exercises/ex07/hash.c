@@ -1,8 +1,11 @@
-/* Example code for Exercises in C.
+/*
+Hash-mapping exercise for Exercises in C.
 
+Exercise:
 Copyright 2016 Allen Downey
 License: Creative Commons Attribution-ShareAlike 3.0
 
+This particular solution: Matt Ruehle
 */
 
 #include <stdio.h>
@@ -17,8 +20,8 @@ License: Creative Commons Attribution-ShareAlike 3.0
 typedef struct {
     enum Type {INT, STRING} type;
     union {
-	int i;
-	char *s;
+	   int i;
+	   char *s;
     };
 } Value;
 
@@ -179,8 +182,14 @@ int hash_hashable(Hashable *hashable)
  */
 int equal_int (void *ip, void *jp)
 {
-    // FILL THIS IN!
-    return 0;
+    int i = *(int *)ip;
+    int j = *(int *)jp;
+    if (i == j) { // did I need to establish these separately, or could I just go if (*(int*)ip == *(int*)jp){...}?
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 
@@ -193,8 +202,14 @@ int equal_int (void *ip, void *jp)
  */
 int equal_string (void *s1, void *s2)
 {
-    // FILL THIS IN!
-    return 0;
+    char* i = (char *)s1;
+    char* j = (char *)s2;
+    if (strcmp(i, j) == 0) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 
@@ -208,8 +223,7 @@ int equal_string (void *s1, void *s2)
  */
 int equal_hashable(Hashable *h1, Hashable *h2)
 {
-    // FILL THIS IN!
-    return 0;
+    return (h1->key == h2->key); // seems too brief...?
 }
 
 
@@ -297,7 +311,13 @@ Node *prepend(Hashable *key, Value *value, Node *rest)
 /* Looks up a key and returns the corresponding value, or NULL */
 Value *list_lookup(Node *list, Hashable *key)
 {
-    // FILL THIS IN!
+    Node* current = list; // could I just use list in place of this?
+    while (current != NULL) {
+        if (equal_hashable(current->key, key)) {
+            return current->value;
+        }
+        current = current->next;
+    }
     return NULL;
 }
 
@@ -342,15 +362,16 @@ void print_map(Map *map)
 /* Adds a key-value pair to a map. */
 void map_add(Map *map, Hashable *key, Value *value)
 {
-    // FILL THIS IN!
+    int target_index = key->hash(key->key); // hashes, using key->hash function, key->key.
+    map->lists[target_index] = prepend(key, value, map->lists[target_index]);
 }
 
 
 /* Looks up a key and returns the corresponding value, or NULL. */
 Value *map_lookup(Map *map, Hashable *key)
 {
-    // FILL THIS IN!
-    return NULL;
+    int target_index = key->hash(key->key);
+    return list_lookup(map->lists[target_index], key);
 }
 
 
