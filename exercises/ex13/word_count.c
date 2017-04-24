@@ -67,13 +67,39 @@ void incr (GHashTable* hash, gchar *key)
     gint *val = (gint *) g_hash_table_lookup (hash, key);
 
     if (val == NULL) {
-	gint *val1 = g_new (gint, 1);
-	*val1 = 1;
-	g_hash_table_insert (hash, key, val1);
+        gchar* key_1 = g_strdup(key);
+    	gint *val1 = g_new (gint, 1);
+    	*val1 = 1;
+    	g_hash_table_insert (hash, key_1, val1);
     } else {
 	*val += 1;
     }
 }
+
+// void free_kvp(gchar* key, gint* value) { // kvp : key value pair
+//     g_free(key);
+//     g_free(value);
+// }
+
+void free_kvp_wrapper(gpointer key, gpointer value, gpointer user_data) {
+    // could probably just directly free the casts? todo: try that out.
+    // just, not now because it is nighttime.
+    g_free( (gchar *) key);
+    g_free( (gint *) value);
+    // free_kvp( (gchar *) key, (gint *) value);
+}
+
+// void free_pair(Pair* p) {
+//     g_free(p);
+// }
+
+void free_pair_wrapper(gpointer value, gpointer user_data) {
+    // free_pair as a GFunc
+    g_free( (Pair*) value);
+    // free_pair((Pair *) value);
+}
+
+
 
 int main (int argc, char** argv)
 {
@@ -107,7 +133,9 @@ int main (int argc, char** argv)
 	array = g_strsplit(line, " ", 0);
 	for (i=0; array[i] != NULL; i++) {
 	    incr(hash, array[i]);
+        // g_free(array[i]);
 	}
+    g_strfreev(array);
     }
     fclose (fp);
 
@@ -123,8 +151,28 @@ int main (int argc, char** argv)
 
     // try (unsuccessfully) to free everything
     // (in a future exercise, we will fix the memory leaks)
+    
+    g_hash_table_foreach(hash, (GHFunc) free_kvp_wrapper, NULL);
     g_hash_table_destroy (hash);
+
+    g_sequence_foreach(seq, (GFunc) free_pair_wrapper, NULL);
     g_sequence_free (seq);
 
     return 0;
 }
+
+/*
+
+==16473== LEAK SUMMARY:
+==16473==    definitely lost: 1,890,348 bytes in 59,300 blocks
+==16473==    indirectly lost: 931,607 bytes in 166,438 blocks
+==16473==      possibly lost: 0 bytes in 0 blocks
+==16473==    still reachable: 2,076 bytes in 3 blocks
+==16473==         suppressed: 0 bytes in 0 blocks
+==16473== Reachable blocks (those to which a pointer was found) are not shown.
+==16473== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==16473== 
+==16473== For counts of detected and suppressed errors, rerun with: -v
+==16473== ERROR SUMMARY: 3 errors from 3 contexts (suppressed: 0 from 0)
+
+*/

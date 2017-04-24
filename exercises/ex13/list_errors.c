@@ -3,6 +3,18 @@
 Copyright 2014 Allen Downey
 License: Creative Commons Attribution-ShareAlike 3.0
 
+
+Originally: 
+==16225== LEAK SUMMARY:
+==16225==    definitely lost: 64 bytes in 4 blocks
+==16225==    indirectly lost: 112 bytes in 7 blocks
+==16225==      possibly lost: 0 bytes in 0 blocks
+==16225==    still reachable: 0 bytes in 0 blocks
+==16225==         suppressed: 0 bytes in 0 blocks
+
+
+
+
 */
 
 #include <stdio.h>
@@ -32,17 +44,18 @@ void print_list(Node *head) {
 }
 
 int pop(Node **head) {
+    Node* head_hold = *head;
     int retval;
-    Node *next_node;
+    Node* next_node;
 
-    if (*head == NULL) {
+    if (head_hold == NULL) {
         return -1;
     }
 
-    next_node = (*head)->next;
-    retval = (*head)->val;
-    *head = next_node;
-
+    next_node = head_hold->next;
+    retval = head_hold->val;
+    *head = next_node; // this should work, right?
+    free(head_hold);
     return retval;
 }
 
@@ -129,8 +142,15 @@ Node *make_something() {
     int val = pop(&node1);
     push(&node2, val);
     node3->next = node2;
-
+    // Node 3 -> Node 1 -> Node 2 -> NULL
     return node3;
+}
+
+
+void free_list(Node **head) {
+    while (*head != NULL) {
+        pop(head);
+    }
 }
 
 int main() {
@@ -161,7 +181,9 @@ int main() {
     print_list(empty);
 
     Node *something = make_something();
-    free(something);
+    free_list(&something);
+    free_list(&test_list);
+    free_list(&empty);
 
     return 0;
 }
